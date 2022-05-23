@@ -1,18 +1,15 @@
 <template>
     <div class="v-datatable" :id="id">
         <div class="v-datatable__header" v-if="header">
-            <select :id="'soryBy_'+id" v-model="sortBy">
-                <option v-for="(item,i) in headers.filter(item=>item.sortable)" :value="item.sortKey" :key="i">
-                    {{ item.text }}
-                </option>
-            </select>
+            <div class="v-datatable__header-slot">
+                <slot name="header"/>
+            </div>
             <div class="v-datatable__header-search">
                 <input type="text" class="v-datatable__header-search-input" @change="searchData">
                 <button class="v-datatable__header-search-button">
                     <img src="../assets/search_dark.png" alt="">
                 </button>
             </div>
-            <slot name="header"/>
         </div>
         <div class="v-datatable__inner">
             <div class="v-datatable__placeholder mt-2" v-if="!items.length || loading">
@@ -38,7 +35,7 @@
             </table>
         </div>
         <div class="v-datatable__footer" v-if="pagination && items.length > 0">
-            <div class="v-datatable__footer-perpage">
+            <div class="v-datatable__footer-item v-datatable__footer-item--perpage">
                 Per Page:
                 <!--                <g-dropdown :caret="true">-->
                 <!--                    <template v-slot:button>-->
@@ -49,14 +46,23 @@
                 <!--                                            @onPress="updatePerPage(item)"/>-->
                 <!--                </g-dropdown>-->
             </div>
-            <div class="v-datatable__footer-info"
+            <div class="v-datatable__footer-item v-datatable__footer-item--info"
                  v-if="paginationTotal > 0">
                 Showing
                 <strong>{{ getShowingItemsLength }}</strong>
                 Of
                 <strong>{{ paginationTotal }}</strong>
             </div>
-            <div class="v-datatable__footer-pagination" v-if="items.length !== paginationTotal">
+            <div class="v-datatable__footer-item v-datatable__footer-item--pagination">
+                <ul class="v-datatable-pagination">
+                    <li class="v-datatable-pagination__item">Prev</li>
+                    <li class="v-datatable-pagination__item">1</li>
+                    <li class="v-datatable-pagination__item">2</li>
+                    <li class="v-datatable-pagination__item">3</li>
+                    <li class="v-datatable-pagination__item">4</li>
+                    <li class="v-datatable-pagination__item">5</li>
+                    <li class="v-datatable-pagination__item">Next</li>
+                </ul>
                 <pagination :limit="1" :data="pagination"
                             @pagination-change-page="paginationChangePage"></pagination>
             </div>
@@ -167,7 +173,7 @@ export default {
             }
             return Number(this.items.length) * Number(this.formattedPaginationData.current_page)
         },
-        copyData(){
+        copyData() {
             return JSON.parse(JSON.stringify(this.items))
         }
     },
@@ -241,7 +247,7 @@ export default {
         },
 
         searchData(event) {
-            console.log('copy',this.copyData)
+            console.log('copy', this.copyData)
             let newData = this.copyData.filter(item => item[this.sortBy].toLowerCase().includes(event.target.value.toLowerCase()))
             this.$emit('search', newData)
         }

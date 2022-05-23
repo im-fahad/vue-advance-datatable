@@ -1,9 +1,9 @@
 <template>
-    <div id="app" style="padding: 30px; background-color: lightgrey">
+    <div id="app" style="padding: 30px; background-color: #ebecf2; min-height: 100vh; box-sizing: border-box">
         <data-table id="dataTable" :headers="headers" :items="data" :pagination="blueprint"
                     @pagination-change-page="changePagination"
                     @per-page="changePagination"
-                    :rows-per-page="perPage" :loading="false" @search="setSearchData">
+                    :rows-per-page="limit" :loading="false" @search="setSearchData">
 
             <!--                  <template slot="header">-->
             <!--                      vgfbgfbfhfhfhfh-->
@@ -15,14 +15,9 @@
             <tr v-for="(item, i) in data" v-bind:key="i">
                 <td class="text-nowrap" v-text="item.id"></td>
                 <td class="text-nowrap" v-text="item.name"></td>
-                <td class="text-nowrap" v-text="item.country"></td>
-                <td class="text-nowrap">
-                    <img :src="item.logo" width="50" alt="">
-                </td>
-                <td class="text-nowrap" v-text="item.slogan"></td>
-                <td class="text-nowrap" v-text="item.head_quaters"></td>
-                <td class="text-nowrap" v-text="item.website"></td>
-                <td class="text-nowrap" v-text="item.established"></td>
+                <td class="text-nowrap" v-text="item.year"></td>
+                <td class="text-nowrap" v-text="item.color"></td>
+                <td class="text-nowrap" v-text="item.pantone_value"></td>
             </tr>
         </data-table>
 
@@ -39,28 +34,15 @@ export default {
     },
     data() {
         return {
-            // headers: [
-            //     {text: this.$t('created_at'), sortable: true, sortKey: 'created_at'},
-            //     {text: this.$t('type'), sortable: true, sortKey: 'type'},
-            //     {text: this.$t('campaign'), sortable: true, sortKey: 'name'},
-            //     {text: this.$t('commission'), sortable: true, sortKey: 'organization_fee'},
-            //     {text: this.$t('raised'), sortable: true, sortKey: 'raised_amount'},
-            //     {text: this.$t('target'), sortable: true, sortKey: 'target_amount'},
-            //     {text: this.$t('status'), sortable: true, sortKey: 'status'},
-            //     {text: this.$t('actions'), sortable: false}
-            // ],
             headers: [
-                {text: 'ID', sortable: true, sortKey: 'id'},
+                {text: '#', sortable: true, sortKey: 'id'},
                 {text: 'Name', sortable: true, sortKey: 'name'},
-                {text: 'Country', sortable: true, sortKey: 'country'},
-                {text: 'Logo', sortable: false},
-                {text: 'Slogan', sortable: true, sortKey: 'slogan'},
-                {text: 'Head Quaters', sortable: true, sortKey: 'head_quaters'},
-                {text: 'Website', sortable: true, sortKey: 'website'},
-                {text: 'Established', sortable: true, sortKey: 'established'}
+                {text: 'Year', sortable: true, sortKey: 'year'},
+                {text: 'Color', sortable: true, sortKey: 'color'},
+                {text: 'Pantone Value', sortable: true, sortKey: 'pantone_value'}
             ],
             blueprint: {},
-            perPage: 10,
+            limit: 5,
             data: [
                 {
                     id: 1,
@@ -213,8 +195,11 @@ export default {
                     website: "www.thaiairways.com",
                     established: "1960"
                 },
-            ]
+            ],
         }
+    },
+    created() {
+        this.fetchData()
     },
     methods: {
         changePagination() {
@@ -222,6 +207,18 @@ export default {
         },
         setSearchData(data) {
             this.data = data
+        },
+        fetchData(page = 1) {
+            fetch(`https://reqres.in/api/product?page=${page}&per_page=${this.limit}`, {
+                method: 'get',
+            })
+                .then(response => response.json())
+                .then(response => {
+                    let {data, ...blueprint} = response
+                    this.data = data
+                    this.blueprint = blueprint
+                    console.log({response})
+                })
         }
     }
 }
